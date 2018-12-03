@@ -1,5 +1,5 @@
-# define motorPin 13
-# define rpmPin A1
+# define motorPin 5
+# define rpmPin 2
 
 # define milisecs 500   // we can change it
 
@@ -24,6 +24,7 @@ void loop()
   val = rpmSensor(); // here is the variable to read the rpm
   speed = Serial.parseInt();  // here is the variable to receive speed input
   inputSpeed(speed);
+  Serial.println(val);
  
   delay (5); // delay in between read for stability
 }
@@ -62,10 +63,9 @@ double rpmSensor()
   double rpm;
   if (millis() - last >= milisecs)
   {
-    rps = ((double)count/slots) / 2.0 * 1000.0 / milisecs;
-    rpm = rps * 60;  //here we get the rpm 
+    rpm = 30000 / (millis() - last)*count;
   }
   count = 0;
   last = millis();
-  return rpm
+  return rpm;
 }

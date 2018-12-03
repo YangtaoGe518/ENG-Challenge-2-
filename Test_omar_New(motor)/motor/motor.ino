@@ -5,6 +5,7 @@ int sensorValue = 0;         // the sensor value
 int sensorMin = 1023;        // minimum sensor value
 int sensorMax = 0;           // maximum sensor value
 int rps = 0 ;
+int val = 10; 
 
 /* global variables */
 int last = 0;
@@ -46,7 +47,9 @@ void loop()
   Serial.println(rpm);
   
   speed = Serial.parseInt();
-  inputSpeed(speed);
+  inputSpeed(speed);  // manuall input
+  //fadeSpeed();  // auto input
+  
 
   delay (5); // delay in between read for stability
 }
@@ -62,8 +65,21 @@ void inputSpeed(int speed)
     }
   }
 }
+/*
+void fadeSpeed()
+{
+  int fadeAmount = 5;
+  analogWrite(motorPin, val);
+  val = val + fadeAmount;
 
-// void fade()
+  if (val <= 0 || val >= 70)
+  {
+    fadeAmount = - fadeAmount;
+  }
+
+  delay (10);
+}
+*/
 
 double getRpm() {
   unsigned long start_time = millis();
