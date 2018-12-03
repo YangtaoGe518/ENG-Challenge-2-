@@ -41,9 +41,10 @@ void setup()
 
 void loop()
 {
-  int speed;
+  int speed; 
   rpm = getRpm();
   Serial.println(rpm);
+  
   speed = Serial.parseInt();
   inputSpeed(speed);
 
@@ -62,14 +63,16 @@ void inputSpeed(int speed)
   }
 }
 
-void getRpm() {
+// void fade()
+
+double getRpm() {
   unsigned long start_time = millis();
   unsigned long end_time = start_time;
   int count = 0;
   int sensor = analogRead(rpmPin);
   int halfpoint = sensorMax / 2 ;
   int newstate = 0 ;
-  while (end_time - start_time < 1000)
+  while (end_time - start_time < 2000)
   {
     if (sensor < halfpoint && newstate != 1)
     {
@@ -85,6 +88,6 @@ void getRpm() {
   }
   
   rps = count ;
-  rpm = rps * 60 ;
-  return rpm
+  rpm = rps * 30 ;
+  return rpm;
 }
