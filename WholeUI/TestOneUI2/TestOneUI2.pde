@@ -8,6 +8,7 @@ Meter m1;
 Meter m2;
 Meter m3;
 PFont font;
+int newline = 10 ; // ASCII
 
 float optTemp = 20;
 float optPH = 5;
@@ -18,9 +19,9 @@ String sendStr;
 int sendMode = 0; //0 = temp, 1=ph, 2=stirring
 boolean firstContact = false;
 
-float nowTemp;
-float nowPH;
-float nowRPM;
+float nowTemp = 25;
+float nowPH = 5;
+float nowRPM = 1000;
 
 int meterTemp;  //chsnge int to float
 int meterPH;  //change int to float
@@ -28,15 +29,15 @@ int meterRPM;
 
 int numReadings = 3;
 float readings[];  //array to read the 3 values
-float pReadings[];  //array to store the previous readings
 
 void setup() {
   size(1440, 960);
   frameRate(50);
-  //println(Serial.list());
+  println(Serial.list());
   printArray(Serial.list());
   myPort = new Serial(this, Serial.list()[0], 9600);
   myPort.bufferUntil('\n');
+
   setMeters();
   setButtons();
 }
@@ -44,6 +45,7 @@ void setup() {
 void draw() {
   background(0);
   //map data to meter
+
   meterTemp = int(map(nowTemp, 25, 35, 0, 255));
   meterPH = int(map(nowPH, 3, 7, 0, 255));
   meterRPM = int(map(nowRPM, 500, 1500, 0, 255));
@@ -72,7 +74,7 @@ void draw() {
 
 void serialEvent(Serial myPort) 
 {
-  val = myPort.readStringUntil('\n');
+  val = myPort.readStringUntil(newline);
   if (val != null) 
   {
     val = trim(val);
@@ -85,15 +87,16 @@ void serialEvent(Serial myPort)
         myPort.write("G");
         println("contact");
       }
-    }
-    pReadings = readings;
-    readings = float(split(val, ','));
-    for (int readingNum = 0; readingNum < readings.length; readingNum++)
+    } 
+    else
     {
-      meterTemp = int(readings[0]);
-      meterRPM = int(readings[1]);
-      meterPH = int(readings[2]);
+      readings = float(split(val, ','));
+      nowTemp = int(readings[0]);
+      nowRPM = int(readings[1]);
+      nowPH = int(readings[2]);
     }
-    myPort.write(sendStr);
   }
+
+  println(nowTemp, nowRPM, nowPH);
+  myPort.write(sendStr);
 }

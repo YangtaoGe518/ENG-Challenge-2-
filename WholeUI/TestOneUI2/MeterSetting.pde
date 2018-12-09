@@ -45,7 +45,7 @@ void setMeterThree(){
   String[] scaleLabels = {"500","600","700","800","900","1000","1100","1200","1300","1400","1500"};
   m3.setScaleLabels(scaleLabels);
   m3.setTitle("Motor RPM");
-  m3.setDisplayDigitalMeterValue(true);
+  m3.setDisplayDigitalMeterValue(false);
   m3.setLowSensorWarningActive(true);
   m3.setLowSensorWarningValue((float)650);
   m3.setHighSensorWarningActive(true);
