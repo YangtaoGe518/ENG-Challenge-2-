@@ -4,8 +4,8 @@
 #define heaterPin 5
 #define tempReadPin A0
 /* Motor */
-#define motorPin A1
-#define rpmPin 4
+#define motorPin 4
+#define rpmPin A1
 /* PH */
 #define phPin A2
 #define pumpOnePin 3  //pumpOne is acid
@@ -17,13 +17,18 @@ char inString;
 float inByte;
 bool modeSetted = false;
 
+/*Real hardware reading*/
+float READTEMP;
+int READRPM;
+float READPH;
+
 /* circuit variables */
 // heater
 float TherVal;
+int Temp = 20;
 float optTemp = 20;   // here i change the original 'Temp' to 'TempOpt'
 // motor
 int sensorMax = 0;
-int realRpm;
 int optRpm;
 // pH
 float voltRead;
@@ -33,7 +38,7 @@ float optPh = 5; // optimal pH
 
 void setup() {
   Serial.begin (9600);
-  establishContact();
+  //establishContact();
   /* set heater pin mode */
   pinMode(heaterPin, OUTPUT);
   pinMode(tempReadPin, INPUT);
@@ -56,15 +61,22 @@ void loop() {
   valueInput();
   /* heater */
   TherVal = analogRead(A0);
-  HeaterControl(TherVal);
+  READTEMP = HeaterControl(TherVal);
   /* motor */
-  realRpm = getRpm(sensorMax);
+  READRPM = getRpm(sensorMax);
   inputOptRpm(optRpm);
   /* pH */
   voltRead = analogRead(A2);
-  pumpControl(voltRead);
-  // delay(1000);  // delay later
+  READPH = pumpControl(voltRead);
+  /* Arduino -> Processing */
+  Serial.print(READTEMP, DEC);
+  Serial.print(',');
+  Serial.print(READRPM, DEC);
+  Serial.print(',');
+  Serial.println(READPH, DEC);
+  delay(1000);
 }
+
 /* communication functions */
 void establishContact()
 {
@@ -106,32 +118,35 @@ void valueInput() {
 }
 
 /* Heater functions */
-void HeaterControl(float TherVal) {
+float HeaterControl(float TherVal) {
   float X;
   float T;
   int HeaterVal;
+  // calculate temp
   X = (1023 / (1023 - TherVal)) - 1;
   T = 1 / (1 / 298.15 + log(X) / 4220) - 273.15;
-  Serial.println( T );
-  if ( T <= optTemp - 4 ) {
+  // control the heater
+  if ( T <= Temp - 4 ) {
     HeaterVal = 180;
   }
-  else if (T <= optTemp - 3) {
+  else if (T <= Temp - 3) {
     HeaterVal = 145;
   }
-  else if (T <= optTemp - 2) {
+  else if (T <= Temp - 2) {
     HeaterVal = 110;
   }
-  else if (T <= optTemp - 1) {
+  else if (T <= Temp - 1) {
     HeaterVal = 75;
   }
-  else if (T <= optTemp) {
+  else if (T <= Temp) {
     HeaterVal = 40;
   }
   else {
     HeaterVal = 0;
   }
   analogWrite(heaterPin, HeaterVal);
+
+  return T;
 }
 
 
@@ -182,7 +197,7 @@ double getRpm(int sensorMax)
 
   int halfpoint = sensorMax / 2 ;  // get the halfpoint
 
-  while (end_time - start_time < 2000)
+  while (end_time - start_time < 1000)
   {
     if (sensor < halfpoint && newstate != 1)
     {
@@ -198,14 +213,16 @@ double getRpm(int sensorMax)
   }
 
   rps = count;
-  rpm = rps * 30 ;
+  rpm = rps * 60 ;
   return rpm;
 }
 
 /* pH functions */
-void pumpControl(float voltRead) {
-  volt = (voltRead * 0.001 - 0.5) / 5;
-  pH =  7 + (volt * 9.6485309 * pow(10, 4)) / (8.314510 * (TherVal + 273.15) * 2.30258509299);
+float pumpControl(float voltRead) {
+  // calculate ph
+  volt = (voltRead * 0.001 - 0.5) / 5 - 0.177;
+  pH =  7 + (volt * 9.6485309 * pow(10, 4)) / (8.314510 * (TherVal + 273.15) * 2.30258509299) - 0.29;
+  // control the pumps
   if (pH > 5)
   {
     digitalWrite(pumpOnePin, HIGH);
@@ -221,4 +238,6 @@ void pumpControl(float voltRead) {
     digitalWrite(pumpOnePin, LOW);
     digitalWrite(pumpTwoPin, HIGH);
   }
+
+  return pH;
 }
