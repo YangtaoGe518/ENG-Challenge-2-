@@ -30,6 +30,8 @@ float optTemp = 20;   // here i change the original 'Temp' to 'TempOpt'
 // motor
 int sensorMax = 0;
 int optRpm;
+double realRpm;
+int motorVolt = 21; // the voltage putting into the analogy
 // pH
 float voltRead;
 double volt;
@@ -176,12 +178,22 @@ int getSensorMax()
 void inputOptRpm(int optRpm)
 {
   /* the function is for writing in speed */
+  realRpm = getRpm(sensorMax);
+
   if (Serial.available())
   {
-    if (optRpm >= 0 && optRpm <= 255)
+    if (abs(optRpm - realRpm) >= 10)
     {
-      analogWrite(motorPin, optRpm);
+      if (optRpm < realRpm)
+      {
+        motorVolt = volt - 1;
+      }
+      else if (optRpm > realRpm)
+      {
+        motorVolt = volt + 1;
+      }
     }
+    analogWrite (motorPin, volt);
   }
 }
 

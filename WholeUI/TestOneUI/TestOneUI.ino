@@ -163,10 +163,22 @@ void inputOptRpm(int optRpm)
   /* the function is for writing in speed */
   if (Serial.available())
   {
-    if (optRpm >= 0 && optRpm <= 255)
+    if (abs(rpm - targetValue) > 10)
     {
-      analogWrite(motorPin, optRpm);
+      if (rpm < targetValue)
+      {
+        test = test + 0.5;
+      }
+      else if (rpm > targetValue)
+      {
+        test = test - 0.5;
+      }
+      else
+      {
+        test;
+      }
     }
+    analogWrite(motorPin, test);
   }
 }
 
