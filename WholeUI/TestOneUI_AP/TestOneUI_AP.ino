@@ -29,7 +29,7 @@ int Temp = 20;
 float optTemp = 20;   // here i change the original 'Temp' to 'TempOpt'
 // motor
 int sensorMax = 0;
-int optRpm;
+int optRpm = 1000;
 double realRpm;
 int motorVolt = 21; // the voltage putting into the analogy
 // pH
@@ -40,7 +40,7 @@ float optPh = 5; // optimal pH
 
 void setup() {
   Serial.begin (9600);
-  //establishContact();
+  establishContact();
   /* set heater pin mode */
   pinMode(heaterPin, OUTPUT);
   pinMode(tempReadPin, INPUT);
@@ -94,12 +94,30 @@ void setMode() {
     inString = Serial.read();
     if ( inString == 'A' ) {
       Mode = 0;
+      // debug use LED light (RED)
+      /*
+      digitalWrite(6, HIGH);
+      digitalWrite(5, LOW);
+      digitalWrite(4, LOW);
+      */
     }
-    if ( inString == 'B' ) {
+    else if ( inString == 'B' ) {
       Mode = 1;
+      // debug use LED light (YELLOW)
+      /*
+      digitalWrite(5, HIGH);
+      digitalWrite(6, LOW);
+      digitalWrite(4, LOW);
+      */
     }
-    if ( inString == 'C' ) {
+    else if ( inString == 'C' ) { 
       Mode = 2;
+      // debug use LED light (GREEN)
+      /*
+      digitalWrite(4, HIGH);
+      digitalWrite(6, LOW);
+      digitalWrite(5, LOW);
+      */
     }
   }
 }
@@ -110,10 +128,10 @@ void valueInput() {
     if (Mode == 0) {
       optTemp = inByte;
     }
-    if (Mode == 1) {
+    else if (Mode == 1) {
       optRpm = inByte;
     }
-    if (Mode == 2) {
+    else if (Mode == 2) {
       optPh = inByte;
     }
   }
@@ -186,11 +204,11 @@ void inputOptRpm(int optRpm)
     {
       if (optRpm < realRpm)
       {
-        motorVolt = volt - 1;
+        motorVolt = motorVolt - 1;
       }
       else if (optRpm > realRpm)
       {
-        motorVolt = volt + 1;
+        motorVolt = motorVolt + 1;
       }
     }
     analogWrite (motorPin, volt);
@@ -209,7 +227,7 @@ double getRpm(int sensorMax)
 
   int halfpoint = sensorMax / 2 ;  // get the halfpoint
 
-  while (end_time - start_time < 1000)
+  while (end_time - start_time < 1000)  // here i change to 1000 rather than 2000 
   {
     if (sensor < halfpoint && newstate != 1)
     {

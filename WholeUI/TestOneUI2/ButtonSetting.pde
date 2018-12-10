@@ -19,28 +19,28 @@ void setButtons(){
 
   cp5.addButton("pHM")
      .setValue(0)
-     .setPosition(1100,400)
+     .setPosition(1100,675)
      .setSize(75,75)
      .setFont(font)
      ;
      
   cp5.addButton("pHP")
      .setValue(0)
-     .setPosition(1200,400)
+     .setPosition(1200,675)
      .setSize(75,75)
      .setFont(font)
      ;
    
   cp5.addButton("rpmM")
      .setValue(0)
-     .setPosition(1100,675)
+     .setPosition(1100,400)
      .setSize(75,75)
      .setFont(font)
      ;
      
   cp5.addButton("rpmP")
      .setValue(0)
-     .setPosition(1200,675)
+     .setPosition(1200,400)
      .setSize(75,75)
      .setFont(font)
      ;
@@ -58,20 +58,20 @@ public void tP(){
 
 public void pHM(){
   optPH -= 0.1;
-  sendMode = 1;
+  sendMode = 2;
 }
 
 public void pHP(){
   optPH += 0.1;
-  sendMode = 1;
+  sendMode = 2;
 }
 
 public void rpmM(){
   optRPM -= 50;
-  sendMode = 2;
+  sendMode = 1;
 }
 
 public void rpmP(){
   optRPM += 50;
-  sendMode = 2;
+  sendMode = 1;
 }

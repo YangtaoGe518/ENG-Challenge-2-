@@ -10,13 +10,13 @@ Meter m3;
 PFont font;
 int newline = 10 ; // ASCII
 
-float optTemp = 20;
+float optTemp = 25;
 float optPH = 5;
 int optRPM = 1000;
 
 String val;
 String sendStr;
-int sendMode = 0; //0 = temp, 1=ph, 2=stirring
+int sendMode = 3; //0 = temp, 1=stirring, 2=ph
 boolean firstContact = false;
 
 float nowTemp = 25;
@@ -33,7 +33,6 @@ float readings[];  //array to read the 3 values
 void setup() {
   size(1440, 960);
   frameRate(50);
-  println(Serial.list());
   printArray(Serial.list());
   myPort = new Serial(this, Serial.list()[0], 9600);
   myPort.bufferUntil('\n');
@@ -59,17 +58,20 @@ void draw() {
   fill(255);
   textSize(48);
   text(optTemp, width/2, 150);
-  text(optPH, width/2, 450);
-  text(optRPM, width/2, 725);
+  text(optRPM, width/2, 450);
+  text(optPH, width/2, 725);
+  
 
   //determine values to send
   if (sendMode == 0) {
     sendStr = "A" + str(optTemp);
   } else if (sendMode == 1) {
-    sendStr = "B" + str(optPH);
+    sendStr = "B" + str(optRPM);
   } else if (sendMode == 2) {
-    sendStr = "C" + str(optRPM);
+    sendStr = "C" + str(optPH);
   }
+  
+  println(sendStr);
 }
 
 void serialEvent(Serial myPort) 
@@ -97,6 +99,6 @@ void serialEvent(Serial myPort)
     }
   }
 
-  println(nowTemp, nowRPM, nowPH);
+  //println(nowTemp, nowRPM, nowPH);
   myPort.write(sendStr);
 }
